@@ -1,7 +1,30 @@
-import { Router } from "express";
+import mongoose from "mongoose";
 
-const router = Router();
+const chatSchema = new mongoose.Schema({
+  type: {
+    type: String,
+    enum: ["personal", "group"],
+    required: true,
+  },
+  members: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+  ],
+  messages: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Message",
+    },
+  ],
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
 
-// all routes goes here
+const Chat = mongoose.model("Chat", chatSchema);
 
-export default router;
+export default Chat;

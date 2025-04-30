@@ -1,7 +1,37 @@
-import { Router } from "express";
+import mongoose from "mongoose";
 
-const router = Router();
+const groupSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  description: {
+    type: String,
+    default: "",
+    trim: true,
+  },
+  chatId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Chat",
+    required: true,
+  },
+  admins: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+  ],
+  picture: {
+    type: String,
+    default: null,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
 
-// all routes goes here
+const Group = mongoose.model("Group", groupSchema);
 
-export default router;
+export default Group;

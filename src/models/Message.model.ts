@@ -1,7 +1,64 @@
-import { Router } from "express";
+import mongoose from "mongoose";
 
-const router = Router();
+const messageSchema = new mongoose.Schema({
+  chatId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Chat",
+    required: true,
+  },
+  sender: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  text: {
+    type: String,
+    trim: true,
+  },
+  type: {
+    type: String,
+    enum: ["text", "image", "video", "audio", "link"],
+    required: true,
+  },
+  link: {
+    type: String,
+    default: null,
+  },
+  repliedTo: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Message",
+    default: null,
+  },
+  receipt: [
+    {
+      userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+      sent: {
+        type: Boolean,
+        default: false,
+      },
+      received: {
+        type: Boolean,
+        default: false,
+      },
+      seen: {
+        type: Boolean,
+        default: false,
+      },
+    },
+  ],
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  deleted: {
+    type: Boolean,
+    default: false,
+  },
+});
 
-// all routes goes here
+const Message = mongoose.model("Message", messageSchema);
 
-export default router;
+export default Message;

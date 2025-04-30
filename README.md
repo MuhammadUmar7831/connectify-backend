@@ -8,9 +8,10 @@ This repository hosts the server (back-end) of Connectify: an open-source chatti
   "_id": "ObjectId",
   "name": "String",
   "email": "String", // Unique, Indexed
+  "password": "String",
   "about": "String",
   "profilePicture": "String",
-  "friends": ["ObjectId"],
+  "friends": ["ObjectId"], // Refers Users
   "createdAt": { "type": "Date", "default": "Date.now" }
 }
 ```
@@ -30,7 +31,7 @@ This repository hosts the server (back-end) of Connectify: an open-source chatti
 ```json
 {
   "_id": "ObjectId",
-  "type": { "type": "String", "enum": ["private", "group"], "required": true },
+  "type": { "type": "String", "enum": ["personal", "group"], "required": true },
   "members": ["ObjectId"], // Array of User IDs
   "messages": ["ObjectId"], // Reference to `messages`
   "createdAt": { "type": "Date", "default": "Date.now" }
@@ -47,12 +48,12 @@ This repository hosts the server (back-end) of Connectify: an open-source chatti
   "type": { "type": "String", "enum": ["text", "image", "video", "audio", "link"], "required": true },
   "link": "String", // For images, videos, and audio messages
   "repliedTo": "ObjectId", // Reference to another `message` for replies can be null
-   receipt: [
+  "receipt": [
     {
-      userId: ObjectId, // Reference to `users`
-      sent: Boolean,
-      received: Boolean,
-      seen: Boolean
+      "userId": "ObjectId", // Reference to `users`
+      "sent": "Boolean",
+      "received": "Boolean",
+      "seen": "Boolean"
     }
   ],
   "createdAt": { "type": "Date", "default": "Date.now" },
