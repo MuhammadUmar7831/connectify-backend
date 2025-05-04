@@ -20,7 +20,7 @@ export async function signin(req: Request, res: Response) {
     return errorResponse(401, "Invalid credentials");
   }
 
-  const tokenPayload = { email: user.email, _id: user._id };
+  const tokenPayload = { name: user.name, email: user.email, _id: user._id, profilePicture: user.profilePicture };
   const accessToken = generateToken(tokenPayload);
 
   return res.status(200).send(response(accessToken, "Signin successful"));
@@ -50,7 +50,7 @@ export async function signup(req: Request, res: Response) {
   const newUser = await User.create(createPayload);
   delete createPayload["password"]; // deleting password for security
 
-  const tokenPayload = { email, _id: newUser._id };
+  const tokenPayload = { name: createPayload.name, email, _id: newUser._id, profilePicture: createPayload.profilePicture };
   const accessToken = generateToken(tokenPayload);
   createPayload.accessToken = accessToken;
 
