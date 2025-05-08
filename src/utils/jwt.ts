@@ -4,7 +4,7 @@ import type { StringValue } from "ms";
 
 export function generateToken(
   payload: JwtPayload,
-  expiresIn: number | StringValue | undefined = "1h"
+  expiresIn: number | StringValue | undefined = "1d"
 ) {
   return jwt.sign(payload, JWT_SECRET, { expiresIn });
 }

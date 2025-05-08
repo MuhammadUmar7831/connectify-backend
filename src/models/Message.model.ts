@@ -35,18 +35,11 @@ const messageSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
       },
-      sent: {
-        type: Boolean,
-        default: false,
-      },
-      received: {
-        type: Boolean,
-        default: false,
-      },
-      seen: {
-        type: Boolean,
-        default: false,
-      },
+      status: {
+        type: String,
+        enum: ["received", "sent", "seen"],
+        required: true,
+      }
     },
   ],
   createdAt: {

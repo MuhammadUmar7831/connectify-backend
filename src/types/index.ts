@@ -12,3 +12,8 @@ export interface IFriendRequest {
   sender: IUser;
   receiver: IUser;
 }
+
+export interface Receipt {
+  userId: string;
+  status: "sent" | "received" | "seen"
+}
