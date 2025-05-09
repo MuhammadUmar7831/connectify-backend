@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.signin = signin;
 exports.signup = signup;
+exports.authenticateUser = authenticateUser;
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const validations_1 = require("../validations");
 const models_1 = require("../models");
@@ -23,7 +24,7 @@ async function signin(req, res) {
     }
     const tokenPayload = { name: user.name, email: user.email, _id: user._id, profilePicture: user.profilePicture };
     const accessToken = (0, utils_1.generateToken)(tokenPayload);
-    return res.status(200).send((0, utils_1.response)(accessToken, "Signin successful"));
+    return res.status(200).send((0, utils_1.response)({ user: tokenPayload, token: accessToken }, "Signin successful"));
 }
 async function signup(req, res) {
     await validations_1.signupBodySchema.validate(req.body, { abortEarly: true });
@@ -45,5 +46,14 @@ async function signup(req, res) {
     const tokenPayload = { name: createPayload.name, email, _id: newUser._id, profilePicture: createPayload.profilePicture };
     const accessToken = (0, utils_1.generateToken)(tokenPayload);
     createPayload.accessToken = accessToken;
-    res.status(201).send((0, utils_1.response)(createPayload, "Signup successful"));
+    res.status(201).send((0, utils_1.response)({ user: tokenPayload, token: createPayload }, "Signup successful"));
+}
+async function authenticateUser(req, res) {
+    const user = await models_1.User.findById(req.user._id);
+    if (!user) {
+        return (0, utils_1.errorResponse)(404, "User not found");
+    }
+    const { _id, name, email, profilePicture } = user;
+    const data = { _id, name, email, profilePicture };
+    return res.status(200).send((0, utils_1.response)(data, "User retrieved"));
 }

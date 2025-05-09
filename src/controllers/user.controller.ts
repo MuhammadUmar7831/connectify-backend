@@ -23,7 +23,7 @@ export async function signin(req: Request, res: Response) {
   const tokenPayload = { name: user.name, email: user.email, _id: user._id, profilePicture: user.profilePicture };
   const accessToken = generateToken(tokenPayload);
 
-  return res.status(200).send(response(accessToken, "Signin successful"));
+  return res.status(200).send(response({ user: tokenPayload, token: accessToken }, "Signin successful"));
 }
 
 export async function signup(req: Request, res: Response) {
@@ -54,5 +54,17 @@ export async function signup(req: Request, res: Response) {
   const accessToken = generateToken(tokenPayload);
   createPayload.accessToken = accessToken;
 
-  res.status(201).send(response(createPayload, "Signup successful"));
+  res.status(201).send(response({ user: tokenPayload, token: createPayload }, "Signup successful"));
+}
+
+export async function authenticateUser(req: Request, res: Response) {
+  const user = await User.findById(req.user._id);
+  if (!user) {
+    return errorResponse(404, "User not found");
+  }
+
+  const { _id, name, email, profilePicture } = user;
+  const data = { _id, name, email, profilePicture };
+
+  return res.status(200).send(response(data, "User retrieved"))
 }
