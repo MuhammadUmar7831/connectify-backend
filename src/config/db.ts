@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 import { DB_NAME, MONGO_URI } from "./constants";
 
-console.log('MONGO_URI', MONGO_URI)
 async function connectDB() {
   try {
     await mongoose.connect(MONGO_URI, {
