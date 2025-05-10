@@ -1,9 +1,10 @@
 import bcrypt from "bcrypt";
 import { Request, Response } from "express";
 import { signinBodySchema, signupBodySchema } from "../validations";
-import { User } from "../models";
+import { Chat, Group, Message, User } from "../models";
 import { errorResponse, generateToken, response, uploadImage } from "../utils";
 import { SALT_ROUNDS } from "../config/constants";
+import mongoose from "mongoose";
 
 export async function signin(req: Request, res: Response) {
   await signinBodySchema.validate(req.body, { abortEarly: true });
@@ -67,4 +68,43 @@ export async function authenticateUser(req: Request, res: Response) {
   const data = { _id, name, email, profilePicture };
 
   return res.status(200).send(response(data, "User retrieved"))
+}
+
+export async function getUserInfo(req: Request, res: Response) {
+  const userId = new mongoose.Types.ObjectId(req.params.userId);
+  const myId = new mongoose.Types.ObjectId(req.user._id)
+
+  const user = await User.findById(userId)
+    .select("_id name about createdAt profilePicture friends")
+    .populate("friends", "_id name profilePicture about");
+
+  if (!user) {
+    return errorResponse(404, 'User not found')
+  }
+
+  const commonChats = await Chat.find({
+    members: { $all: [userId, myId] },
+  })
+
+  const commonGroups = await Group.find({
+    chatId: { $in: commonChats.map(chat => chat._id) }
+  }).populate({
+    path: 'chatId',
+    populate: {
+      path: 'members',
+      select: '_id name',
+    },
+    select: '_id members type'
+  })
+    .select("_id name picture chatId");
+
+  const personalChat = commonChats.find((chat) => chat.type == 'personal')
+  const isFriend = user.friends.includes(myId)
+
+  const mediaMessages = await Message.find({
+    _id: { $in: personalChat?.messages || [] },
+    type: { $nin: ['text', 'audio'] }
+  }).select("_id link type")
+
+  return res.status(200).send(response({ user, commonGroups, chatId: personalChat?._id, mediaMessages, isFriend }, "User info retrieved"))
 }

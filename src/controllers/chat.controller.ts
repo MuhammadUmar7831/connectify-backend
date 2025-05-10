@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { Chat, Group } from "../models";
+import { Chat, Group, Message, User } from "../models";
 import { createGroupChatSchema, createPersonalChatSchema } from "../validations/chat.validator";
 import { errorResponse, response, uploadImage } from "../utils";
 import mongoose from "mongoose";

@@ -6,11 +6,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.signin = signin;
 exports.signup = signup;
 exports.authenticateUser = authenticateUser;
+exports.getUserInfo = getUserInfo;
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const validations_1 = require("../validations");
 const models_1 = require("../models");
 const utils_1 = require("../utils");
 const constants_1 = require("../config/constants");
+const mongoose_1 = __importDefault(require("mongoose"));
 async function signin(req, res) {
     await validations_1.signinBodySchema.validate(req.body, { abortEarly: true });
     const { email, password } = req.body;
@@ -56,4 +58,35 @@ async function authenticateUser(req, res) {
     const { _id, name, email, profilePicture } = user;
     const data = { _id, name, email, profilePicture };
     return res.status(200).send((0, utils_1.response)(data, "User retrieved"));
+}
+async function getUserInfo(req, res) {
+    const userId = new mongoose_1.default.Types.ObjectId(req.params.userId);
+    const myId = new mongoose_1.default.Types.ObjectId(req.user._id);
+    const user = await models_1.User.findById(userId)
+        .select("_id name about createdAt profilePicture friends")
+        .populate("friends", "_id name profilePicture about");
+    if (!user) {
+        return (0, utils_1.errorResponse)(404, 'User not found');
+    }
+    const commonChats = await models_1.Chat.find({
+        members: { $all: [userId, myId] },
+    });
+    const commonGroups = await models_1.Group.find({
+        chatId: { $in: commonChats.map(chat => chat._id) }
+    }).populate({
+        path: 'chatId',
+        populate: {
+            path: 'members',
+            select: '_id name',
+        },
+        select: '_id members type'
+    })
+        .select("_id name picture chatId");
+    const personalChat = commonChats.find((chat) => chat.type == 'personal');
+    const isFriend = user.friends.includes(myId);
+    const mediaMessages = await models_1.Message.find({
+        _id: { $in: personalChat?.messages || [] },
+        type: { $nin: ['text', 'audio'] }
+    }).select("_id link type");
+    return res.status(200).send((0, utils_1.response)({ user, commonGroups, chatId: personalChat?._id, mediaMessages, isFriend }, "User info retrieved"));
 }

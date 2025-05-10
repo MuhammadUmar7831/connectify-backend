@@ -13,4 +13,5 @@ const router = (0, express_1.Router)();
 router.get("/auth", authenticate_1.authenticate, (0, utils_1.tryCatch)(controllers_1.authenticateUser));
 router.post("/signin", (0, utils_1.tryCatch)(controllers_1.signin));
 router.post("/signup", upload_1.default.single("profilePicture"), (0, utils_1.tryCatch)(controllers_1.signup));
+router.get("/:userId", authenticate_1.authenticate, (0, utils_1.tryCatch)(controllers_1.getUserInfo));
 exports.default = router;

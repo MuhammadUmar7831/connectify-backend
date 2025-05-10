@@ -35,6 +35,9 @@ export async function sendMessage(req: Request, res: Response, next: NextFunctio
   if (!chat) {
     return errorResponse(404, "Chat not found");
   }
+  if (!chat.members.includes(new mongoose.Types.ObjectId(req.user._id))){
+    return errorResponse(401, "You are not member of this chat")
+  }
 
   if (repliedTo) {
     const reply = await Message.findById(repliedTo);
@@ -102,7 +105,7 @@ export async function getAllMessages(req: Request, res: Response) {
 
   const messages = await Message.find({ chatId })
     .populate("sender", "_id name profilePicture")
-    .populate("repliedTo", "_id name profilePicture")
+    .populate("repliedTo", "_id sender text link")
 
   return res.status(200).send(response(messages, "Messages retrieved"))
 }
