@@ -115,6 +115,24 @@ async function getAllChats(req, res) {
             $lookup: {
                 from: "users",
                 foreignField: "_id",
+                localField: "members",
+                as: "members",
+                pipeline: [
+                    {
+                        $project: {
+                            _id: 1,
+                            name: 1,
+                            profilePicture: 1,
+                            about: 1
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $lookup: {
+                from: "users",
+                foreignField: "_id",
                 localField: "otherUser",
                 as: "otherUser"
             }
@@ -160,7 +178,6 @@ async function getAllChats(req, res) {
             $project: {
                 group: 0,
                 otherUser: 0,
-                members: 0,
                 messages: 0
             }
         }
