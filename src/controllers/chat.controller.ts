@@ -18,7 +18,7 @@ export async function createPersonalChat(req: Request, res: Response) {
     return errorResponse(400, "You already have a personal chat with this user");
   }
 
-  const chat = await Chat.create({ type: "personal", members: [userId] })
+  const chat = await Chat.create({ type: "personal", members: [req.user._id, userId] })
 
   return res.status(200).send(response(chat, "Chat created"))
 }

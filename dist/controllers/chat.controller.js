@@ -20,7 +20,7 @@ async function createPersonalChat(req, res) {
     if (existingChat) {
         return (0, utils_1.errorResponse)(400, "You already have a personal chat with this user");
     }
-    const chat = await models_1.Chat.create({ type: "personal", members: [userId] });
+    const chat = await models_1.Chat.create({ type: "personal", members: [req.user._id, userId] });
     return res.status(200).send((0, utils_1.response)(chat, "Chat created"));
 }
 async function createGroupChat(req, res) {
