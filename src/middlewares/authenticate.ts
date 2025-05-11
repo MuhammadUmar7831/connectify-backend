@@ -9,6 +9,5 @@ export const authenticate = tryCatch(async (req: Request, res: Response, next: N
   }
   const user = jwt.verify(token, process.env.JWT_SECRET as string) as User
   req.user = user
-  console.log(req.user)
   next();
 })

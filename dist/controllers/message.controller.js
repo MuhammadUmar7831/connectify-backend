@@ -9,6 +9,8 @@ const message_validator_1 = require("../validations/message.validator");
 const utils_1 = require("../utils");
 const models_1 = require("../models");
 const mongoose_1 = __importDefault(require("mongoose"));
+const index_1 = require("../socket/index");
+const socket_1 = require("../socket");
 async function sendMessage(req, res, next) {
     await message_validator_1.sendMessageSchema.validate(req.body);
     const { type, chatId, text, repliedTo } = req.body;
@@ -48,12 +50,24 @@ async function sendMessage(req, res, next) {
         }
     }
     const members = chat.members;
+    const onlineUserIds = Object.values(index_1.activeUsers);
+    const roomMembers = socket_1.io.sockets.adapter.rooms.get(chatId);
     const receipt = members
         .filter(member => member.toString() !== req.user._id.toString())
-        .map(member => ({
-        userId: member.toString(),
-        status: "sent"
-    }));
+        .map(member => {
+        const userId = member.toString();
+        let status = 'sent';
+        if (roomMembers && roomMembers?.has(userId)) {
+            status = 'seen';
+        }
+        else if (onlineUserIds && onlineUserIds.includes(userId)) {
+            status = 'received';
+        }
+        return {
+            userId,
+            status
+        };
+    });
     // Transaction start
     const session = await mongoose_1.default.startSession();
     try {

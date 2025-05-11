@@ -4,6 +4,8 @@ import { errorResponse, response, uploadAudio, uploadImage, uploadVideo } from "
 import { Chat, Message } from "../models";
 import { Receipt } from "../types";
 import mongoose from "mongoose";
+import { activeUsers } from "../socket/index";
+import { io } from "../socket";
 
 export async function sendMessage(req: Request, res: Response, next: NextFunction) {
   await sendMessageSchema.validate(req.body);
@@ -35,7 +37,7 @@ export async function sendMessage(req: Request, res: Response, next: NextFunctio
   if (!chat) {
     return errorResponse(404, "Chat not found");
   }
-  if (!chat.members.includes(new mongoose.Types.ObjectId(req.user._id))){
+  if (!chat.members.includes(new mongoose.Types.ObjectId(req.user._id))) {
     return errorResponse(401, "You are not member of this chat")
   }
 
@@ -50,12 +52,28 @@ export async function sendMessage(req: Request, res: Response, next: NextFunctio
   }
 
   const members = chat.members;
+
+  const onlineUserIds = Object.values(activeUsers);
+  const roomMembers = io.sockets.adapter.rooms.get(chatId);
+
+
   const receipt: Receipt[] = members
     .filter(member => member.toString() !== req.user._id.toString())
-    .map(member => ({
-      userId: member.toString(),
-      status: "sent"
-    }));
+    .map(member => {
+      const userId = member.toString();
+      let status: "sent" | 'seen' | 'received' = 'sent';
+
+      if (roomMembers && roomMembers?.has(userId)) {
+        status = 'seen'
+      } else if (onlineUserIds && onlineUserIds.includes(userId)) {
+        status = 'received'
+      }
+
+      return {
+        userId,
+        status
+      }
+    });
 
   // Transaction start
   const session = await mongoose.startSession();
@@ -99,7 +117,7 @@ export async function getAllMessages(req: Request, res: Response) {
   if (!chat) {
     return errorResponse(404, "Chat not found")
   }
-  if (!chat.members.includes(new mongoose.Types.ObjectId(req.user._id))){
+  if (!chat.members.includes(new mongoose.Types.ObjectId(req.user._id))) {
     return errorResponse(401, "You are not member of this chat")
   }
 
