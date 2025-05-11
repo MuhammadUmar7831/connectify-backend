@@ -36,7 +36,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createGroupChatSchema = exports.createPersonalChatSchema = void 0;
 const yup = __importStar(require("yup"));
 exports.createPersonalChatSchema = yup.object({
-    userId: yup.number().required('User Id is required'),
+    userId: yup.string().required('User Id is required'),
 }).noUnknown(true, "Unexpected keys are not allowed");
 exports.createGroupChatSchema = yup.object({
     name: yup.string().required('Group name is required'),

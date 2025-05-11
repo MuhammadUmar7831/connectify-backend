@@ -1,7 +1,7 @@
 import * as yup from "yup";
 
 export const createPersonalChatSchema = yup.object({
-  userId: yup.number().required('User Id is required'),
+  userId: yup.string().required('User Id is required'),
 }).noUnknown(true, "Unexpected keys are not allowed");
 
 export const createGroupChatSchema = yup.object({
