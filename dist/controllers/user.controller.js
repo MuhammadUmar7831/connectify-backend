@@ -8,12 +8,14 @@ exports.signup = signup;
 exports.authenticateUser = authenticateUser;
 exports.getUserInfo = getUserInfo;
 exports.getAllUsers = getAllUsers;
+exports.getActiveUsers = getActiveUsers;
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const validations_1 = require("../validations");
 const models_1 = require("../models");
 const utils_1 = require("../utils");
 const constants_1 = require("../config/constants");
 const mongoose_1 = __importDefault(require("mongoose"));
+const index_1 = require("../socket/index");
 async function signin(req, res) {
     await validations_1.signinBodySchema.validate(req.body, { abortEarly: true });
     const { email, password } = req.body;
@@ -98,4 +100,8 @@ async function getAllUsers(req, res) {
     })
         .select("_id name profilePicture about");
     return res.status(200).send((0, utils_1.response)(users, "Users retrieved"));
+}
+async function getActiveUsers(req, res) {
+    const activeUserIds = Array.from(index_1.activeUsers.values());
+    return res.status(200).send((0, utils_1.response)(activeUserIds, "Users retrieved"));
 }

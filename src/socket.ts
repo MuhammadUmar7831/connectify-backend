@@ -16,6 +16,8 @@ io.on("connection", (socket) => {
   socketHandler(io, socket)
 
   socket.on("disconnect", () => {
+    console.log(activeUsers)
+    io.emit('userLeft', activeUsers.get(socket.id))
     activeUsers.delete(socket.id);
     console.log(`❌: User disconnected: ${socket.id}`);
   });

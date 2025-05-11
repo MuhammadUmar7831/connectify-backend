@@ -49,6 +49,8 @@ exports.io.on("connection", (socket) => {
     console.log(`⚡: User connected: ${socket.id}`);
     (0, index_1.default)(exports.io, socket);
     socket.on("disconnect", () => {
+        console.log(index_1.activeUsers);
+        exports.io.emit('userLeft', index_1.activeUsers.get(socket.id));
         index_1.activeUsers.delete(socket.id);
         console.log(`❌: User disconnected: ${socket.id}`);
     });

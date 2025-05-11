@@ -14,5 +14,6 @@ router.get("/auth", authenticate_1.authenticate, (0, utils_1.tryCatch)(controlle
 router.post("/signin", (0, utils_1.tryCatch)(controllers_1.signin));
 router.post("/signup", upload_1.default.single("profilePicture"), (0, utils_1.tryCatch)(controllers_1.signup));
 router.get("/all", authenticate_1.authenticate, (0, utils_1.tryCatch)(controllers_1.getAllUsers));
+router.get("/active", authenticate_1.authenticate, (0, utils_1.tryCatch)(controllers_1.getActiveUsers));
 router.get("/:userId", authenticate_1.authenticate, (0, utils_1.tryCatch)(controllers_1.getUserInfo));
 exports.default = router;

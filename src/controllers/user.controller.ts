@@ -5,6 +5,7 @@ import { Chat, Group, Message, User } from "../models";
 import { errorResponse, generateToken, response, uploadImage } from "../utils";
 import { SALT_ROUNDS } from "../config/constants";
 import mongoose from "mongoose";
+import { activeUsers } from "../socket/index";
 
 export async function signin(req: Request, res: Response) {
   await signinBodySchema.validate(req.body, { abortEarly: true });
@@ -117,4 +118,9 @@ export async function getAllUsers(req: Request, res: Response) {
     .select("_id name profilePicture about")
 
   return res.status(200).send(response(users, "Users retrieved"))
+}
+
+export async function getActiveUsers(req: Request, res: Response) {
+  const activeUserIds = Array.from(activeUsers.values());
+  return res.status(200).send(response(activeUserIds, "Users retrieved"))
 }

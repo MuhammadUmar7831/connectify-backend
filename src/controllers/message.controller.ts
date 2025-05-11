@@ -53,7 +53,7 @@ export async function sendMessage(req: Request, res: Response, next: NextFunctio
 
   const members = chat.members;
 
-  const onlineUserIds = Object.values(activeUsers);
+  const onlineUserIds = Array.from(activeUsers.values());
   const roomMembers = io.sockets.adapter.rooms.get(chatId);
 
 

@@ -8,7 +8,9 @@ function socketHandler(io, socket) {
     // whenever someone connect he must emit this so backend can keep record of him
     socket.on("active", async ({ userId }) => {
         exports.activeUsers.set(socket.id, userId);
+        console.log(exports.activeUsers);
         await (0, message_1.updateNotReceivedMessages)({ userId });
+        io.emit('userJoined', userId);
         console.log(`✅ User ${userId} is active with socket ${socket.id}`);
     });
     // Join a specific chat

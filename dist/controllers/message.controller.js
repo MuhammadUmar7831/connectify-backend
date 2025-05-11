@@ -50,7 +50,7 @@ async function sendMessage(req, res, next) {
         }
     }
     const members = chat.members;
-    const onlineUserIds = Object.values(index_1.activeUsers);
+    const onlineUserIds = Array.from(index_1.activeUsers.values());
     const roomMembers = socket_1.io.sockets.adapter.rooms.get(chatId);
     const receipt = members
         .filter(member => member.toString() !== req.user._id.toString())
