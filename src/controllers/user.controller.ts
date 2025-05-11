@@ -108,3 +108,13 @@ export async function getUserInfo(req: Request, res: Response) {
 
   return res.status(200).send(response({ user, commonGroups, chatId: personalChat?._id, mediaMessages, isFriend }, "User info retrieved"))
 }
+
+export async function getAllUsers(req: Request, res: Response) {
+  const userId = new mongoose.Types.ObjectId(req.user._id)
+  const users = await User.find({
+    _id: { $ne: userId }
+  })
+    .select("_id name profilePicture about")
+
+  return res.status(200).send(response(users, "Users retrieved"))
+}

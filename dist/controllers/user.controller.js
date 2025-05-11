@@ -7,6 +7,7 @@ exports.signin = signin;
 exports.signup = signup;
 exports.authenticateUser = authenticateUser;
 exports.getUserInfo = getUserInfo;
+exports.getAllUsers = getAllUsers;
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const validations_1 = require("../validations");
 const models_1 = require("../models");
@@ -89,4 +90,12 @@ async function getUserInfo(req, res) {
         type: { $nin: ['text', 'audio'] }
     }).select("_id link type");
     return res.status(200).send((0, utils_1.response)({ user, commonGroups, chatId: personalChat?._id, mediaMessages, isFriend }, "User info retrieved"));
+}
+async function getAllUsers(req, res) {
+    const userId = new mongoose_1.default.Types.ObjectId(req.user._id);
+    const users = await models_1.User.find({
+        _id: { $ne: userId }
+    })
+        .select("_id name profilePicture about");
+    return res.status(200).send((0, utils_1.response)(users, "Users retrieved"));
 }

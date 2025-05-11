@@ -13,5 +13,6 @@ exports.authenticate = (0, utils_1.tryCatch)(async (req, res, next) => {
     }
     const user = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
     req.user = user;
+    console.log(req.user);
     next();
 });
