@@ -11,7 +11,7 @@ export const isValidMimeType = (expectedType: string, mime: string): boolean => 
   const mimeMap: Record<string, string[]> = {
     image: ["image/png", "image/jpeg", "image/jpg", "image/webp", "image/gif"],
     video: ["video/mp4", "video/webm", "video/ogg"],
-    audio: ["audio/mpeg", "audio/wav", "audio/ogg", "audio/mp3"],
+    audio: ["audio/mpeg", "audio/wav", "audio/ogg", "audio/mp3", "audio/webm"],
   };
 
   return mimeMap[expectedType]?.includes(mime) ?? false;
